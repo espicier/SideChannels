@@ -1,5 +1,4 @@
-// C
-
+# * C *
 # Prerequisites
 *.d
 
@@ -53,7 +52,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-// Python
+
+# * Python * 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -228,3 +228,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+#  * ASCAD *
+/ASCAD/ASCAD_data.zip
+/ASCAD/ASCAD_data
+/ASCAD/ASCAD/
+
+# * Random *
+.DS_Store
