@@ -1,0 +1,342 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__CCP__ = 0x34
+   7               	__tmp_reg__ = 0
+   8               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+  11               		.cfi_sections	.debug_frame
+  12               	.global	handle
+  14               	handle:
+  15               	.LVL0:
+  16               	.LFB15:
+  17               		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        ****  * SimpleSerial V2 Template C code
+   3:main.c        ****  * Can be freely used to implement ChipWhisperer target binaries.
+   4:main.c        ****  *
+   5:main.c        ****  * Date: 14th March 2021
+   6:main.c        ****  */
+   7:main.c        **** 
+   8:main.c        **** #include <stdint.h>
+   9:main.c        **** #include <stdlib.h>
+  10:main.c        **** // Added by myself, to use: trigger_high(), trigger_low(), trigger_setup(), init_uart()
+  11:main.c        **** #include "simpleserial.h"
+  12:main.c        **** #include "hal.h"
+  13:main.c        **** 
+  14:main.c        **** // Command to compile the code:
+  15:main.c        **** // make PLATFORM=CWLITEXMEGA
+  16:main.c        **** // make PLATFORM=CWLITEXMEGA FIRMWAREPATH=../chipwhisperer/firmware/mcu
+  17:main.c        **** 
+  18:main.c        **** /// This function will handle the 'p' command send from the capture board.
+  19:main.c        **** /// It returns the squared version of the scmd given.
+  20:main.c        **** /// It does this in approximately equal time, which allows us to see clear
+  21:main.c        **** /// differences between different scmd values.
+  22:main.c        **** uint8_t handle(uint8_t cmd, uint8_t scmd, uint8_t len, uint8_t *buf)
+  23:main.c        **** {
+  18               		.loc 1 23 1 view -0
+  19               		.cfi_startproc
+  20               		.loc 1 23 1 is_stmt 0 view .LVU1
+  21 0000 CF93      		push r28
+  22               	.LCFI0:
+  23               		.cfi_def_cfa_offset 4
+  24               		.cfi_offset 28, -3
+  25 0002 DF93      		push r29
+  26               	.LCFI1:
+  27               		.cfi_def_cfa_offset 5
+  28               		.cfi_offset 29, -4
+  29 0004 00D0      		rcall .
+  30               	.LCFI2:
+  31               		.cfi_def_cfa_offset 8
+  32 0006 CDB7      		in r28,__SP_L__
+  33 0008 DEB7      		in r29,__SP_H__
+  34               	.LCFI3:
+  35               		.cfi_def_cfa_register 28
+  36               	/* prologue: function */
+  37               	/* frame size = 3 */
+  38               	/* stack size = 5 */
+  39               	.L__stack_usage = 5
+  24:main.c        ****   volatile uint8_t result = 0;
+  40               		.loc 1 24 3 is_stmt 1 view .LVU2
+  41               		.loc 1 24 20 is_stmt 0 view .LVU3
+  42 000a 1B82      		std Y+3,__zero_reg__
+  25:main.c        **** 
+  26:main.c        ****   // Start measurement.
+  27:main.c        ****   trigger_high();
+  43               		.loc 1 27 3 is_stmt 1 view .LVU4
+  44 000c 81E0      		ldi r24,lo8(1)
+  45               	.LVL1:
+  46               		.loc 1 27 3 is_stmt 0 view .LVU5
+  47 000e 8093 0506 		sts 1541,r24
+  28:main.c        **** 
+  29:main.c        ****   // Cause more clock cycles to happen the higher the scmd is
+  30:main.c        ****   // We need 'volatile' here because we don't want the compiler to optimize the
+  31:main.c        ****   // loop out.
+  32:main.c        ****   for (volatile uint8_t i = 0; i < 255; i++) {
+  48               		.loc 1 32 3 is_stmt 1 view .LVU6
+  49               	.LBB2:
+  50               		.loc 1 32 8 view .LVU7
+  51               		.loc 1 32 25 is_stmt 0 view .LVU8
+  52 0012 1A82      		std Y+2,__zero_reg__
+  33:main.c        ****     if (i == scmd) {
+  34:main.c        ****         result = scmd * scmd;
+  53               		.loc 1 34 23 view .LVU9
+  54 0014 669F      		mul r22,r22
+  55 0016 902D      		mov r25,r0
+  56 0018 1124      		clr r1
+  57               	.L2:
+  32:main.c        ****     if (i == scmd) {
+  58               		.loc 1 32 32 is_stmt 1 discriminator 1 view .LVU10
+  32:main.c        ****     if (i == scmd) {
+  59               		.loc 1 32 34 is_stmt 0 discriminator 1 view .LVU11
+  60 001a 8A81      		ldd r24,Y+2
+  32:main.c        ****     if (i == scmd) {
+  61               		.loc 1 32 3 discriminator 1 view .LVU12
+  62 001c 8F3F      		cpi r24,lo8(-1)
+  63 001e 01F4      		brne .L4
+  64               	.LBE2:
+  35:main.c        ****     }
+  36:main.c        ****   }
+  37:main.c        **** 
+  38:main.c        ****   // Stop measurement.
+  39:main.c        ****   trigger_low();
+  65               		.loc 1 39 3 is_stmt 1 view .LVU13
+  66 0020 81E0      		ldi r24,lo8(1)
+  67 0022 8093 0606 		sts 1542,r24
+  40:main.c        **** 
+  41:main.c        ****   // For now we can just return the result back to the user.
+  42:main.c        ****   uint8_t buff[1] = { result };
+  68               		.loc 1 42 3 view .LVU14
+  69               		.loc 1 42 11 is_stmt 0 view .LVU15
+  70 0026 8B81      		ldd r24,Y+3
+  71 0028 8983      		std Y+1,r24
+  43:main.c        ****   simpleserial_put('r', 1, buff);
+  72               		.loc 1 43 3 is_stmt 1 view .LVU16
+  73 002a AE01      		movw r20,r28
+  74               	.LVL2:
+  75               		.loc 1 43 3 is_stmt 0 view .LVU17
+  76 002c 4F5F      		subi r20,-1
+  77 002e 5F4F      		sbci r21,-1
+  78 0030 61E0      		ldi r22,lo8(1)
+  79               	.LVL3:
+  80               		.loc 1 43 3 view .LVU18
+  81 0032 82E7      		ldi r24,lo8(114)
+  82 0034 0E94 0000 		call simpleserial_put
+  83               	.LVL4:
+  44:main.c        **** 
+  45:main.c        ****   return 0;
+  84               		.loc 1 45 3 is_stmt 1 view .LVU19
+  46:main.c        **** }
+  85               		.loc 1 46 1 is_stmt 0 view .LVU20
+  86 0038 80E0      		ldi r24,0
+  87               	/* epilogue start */
+  88 003a 2396      		adiw r28,3
+  89 003c CDBF      		out __SP_L__,r28
+  90 003e DEBF      		out __SP_H__,r29
+  91 0040 DF91      		pop r29
+  92 0042 CF91      		pop r28
+  93 0044 0895      		ret
+  94               	.LVL5:
+  95               	.L4:
+  96               	.LBB3:
+  33:main.c        ****         result = scmd * scmd;
+  97               		.loc 1 33 5 is_stmt 1 view .LVU21
+  33:main.c        ****         result = scmd * scmd;
+  98               		.loc 1 33 11 is_stmt 0 view .LVU22
+  99 0046 8A81      		ldd r24,Y+2
+  33:main.c        ****         result = scmd * scmd;
+ 100               		.loc 1 33 8 view .LVU23
+ 101 0048 8613      		cpse r24,r22
+ 102 004a 00C0      		rjmp .L3
+  34:main.c        ****     }
+ 103               		.loc 1 34 9 is_stmt 1 view .LVU24
+  34:main.c        ****     }
+ 104               		.loc 1 34 16 is_stmt 0 view .LVU25
+ 105 004c 9B83      		std Y+3,r25
+ 106               	.L3:
+  32:main.c        ****     if (i == scmd) {
+ 107               		.loc 1 32 41 is_stmt 1 discriminator 2 view .LVU26
+  32:main.c        ****     if (i == scmd) {
+ 108               		.loc 1 32 42 is_stmt 0 discriminator 2 view .LVU27
+ 109 004e 8A81      		ldd r24,Y+2
+ 110 0050 8F5F      		subi r24,lo8(-(1))
+ 111 0052 8A83      		std Y+2,r24
+ 112 0054 00C0      		rjmp .L2
+ 113               	.LBE3:
+ 114               		.cfi_endproc
+ 115               	.LFE15:
+ 117               		.section	.text.startup,"ax",@progbits
+ 118               	.global	main
+ 120               	main:
+ 121               	.LFB16:
+  47:main.c        **** 
+  48:main.c        **** int main(void) {
+ 122               		.loc 1 48 16 is_stmt 1 view -0
+ 123               		.cfi_startproc
+ 124               	/* prologue: function */
+ 125               	/* frame size = 0 */
+ 126               	/* stack size = 0 */
+ 127               	.L__stack_usage = 0
+  49:main.c        ****   // Setup the specific chipset.
+  50:main.c        ****   platform_init();
+ 128               		.loc 1 50 3 view .LVU29
+ 129 0000 0E94 0000 		call platform_init
+ 130               	.LVL6:
+  51:main.c        ****   // Setup serial communication line.
+  52:main.c        ****   init_uart();
+ 131               		.loc 1 52 3 view .LVU30
+ 132 0004 0E94 0000 		call init_uart0
+ 133               	.LVL7:
+  53:main.c        ****   // Setup measurement trigger.
+  54:main.c        ****   trigger_setup();
+ 134               		.loc 1 54 3 view .LVU31
+ 135 0008 81E0      		ldi r24,lo8(1)
+ 136 000a 8093 0106 		sts 1537,r24
+  55:main.c        **** 
+  56:main.c        ****   simpleserial_init();
+ 137               		.loc 1 56 3 view .LVU32
+ 138 000e 0E94 0000 		call simpleserial_init
+ 139               	.LVL8:
+  57:main.c        **** 
+  58:main.c        ****   // Insert your handlers here.
+  59:main.c        ****   simpleserial_addcmd('p', 16, handle);
+ 140               		.loc 1 59 3 view .LVU33
+ 141 0012 40E0      		ldi r20,lo8(gs(handle))
+ 142 0014 50E0      		ldi r21,hi8(gs(handle))
+ 143 0016 60E1      		ldi r22,lo8(16)
+ 144 0018 70E0      		ldi r23,0
+ 145 001a 80E7      		ldi r24,lo8(112)
+ 146 001c 0E94 0000 		call simpleserial_addcmd
+ 147               	.LVL9:
+ 148               	.L6:
+  60:main.c        **** 
+  61:main.c        ****   // What for the capture board to send commands and handle them.
+  62:main.c        ****   while (1)
+ 149               		.loc 1 62 3 discriminator 1 view .LVU34
+  63:main.c        ****     simpleserial_get();
+ 150               		.loc 1 63 5 discriminator 1 view .LVU35
+ 151 0020 0E94 0000 		call simpleserial_get
+ 152               	.LVL10:
+  62:main.c        ****     simpleserial_get();
+ 153               		.loc 1 62 9 discriminator 1 view .LVU36
+ 154 0024 00C0      		rjmp .L6
+ 155               		.cfi_endproc
+ 156               	.LFE16:
+ 158               		.text
+ 159               	.Letext0:
+ 160               		.file 2 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/stdint.h"
+ 161               		.file 3 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/lib/avr-gcc/9/gcc/avr/9.4.0/include/stddef.h"
+ 162               		.file 4 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/stdlib.h"
+ 163               		.file 5 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/avr/iox128d3.h"
+ 164               		.file 6 "./hal/hal.h"
+ 165               		.file 7 "./hal/xmega/uart.h"
+ 166               		.file 8 "./simpleserial/simpleserial.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:2      *ABS*:0000003e __SP_H__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:3      *ABS*:0000003d __SP_L__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:4      *ABS*:0000003f __SREG__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:5      *ABS*:0000003b __RAMPZ__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:6      *ABS*:00000034 __CCP__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:7      *ABS*:00000000 __tmp_reg__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:8      *ABS*:00000001 __zero_reg__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:14     .text:00000000 handle
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:18     .text:00000000 .Loc.0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:19     .text:00000000 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:20     .text:00000000 .Loc.1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:29     .text:00000006 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:40     .text:0000000a .Loc.2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:41     .text:0000000a .Loc.3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:43     .text:0000000c .Loc.4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:46     .text:0000000e .Loc.5
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:48     .text:00000012 .Loc.6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:50     .text:00000012 .Loc.7
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:51     .text:00000012 .Loc.8
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:53     .text:00000014 .Loc.9
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:58     .text:0000001a .Loc.10
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:59     .text:0000001a .Loc.11
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:61     .text:0000001c .Loc.12
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:65     .text:00000020 .Loc.13
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:68     .text:00000026 .Loc.14
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:69     .text:00000026 .Loc.15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:72     .text:0000002a .Loc.16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:75     .text:0000002c .Loc.17
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:80     .text:00000032 .Loc.18
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:84     .text:00000038 .Loc.19
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:85     .text:00000038 .Loc.20
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:97     .text:00000046 .Loc.21
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:98     .text:00000046 .Loc.22
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:100    .text:00000048 .Loc.23
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:103    .text:0000004c .Loc.24
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:104    .text:0000004c .Loc.25
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:107    .text:0000004e .Loc.26
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:108    .text:0000004e .Loc.27
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:114    .text:00000056 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:120    .text.startup:00000000 main
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:122    .text.startup:00000000 .Loc.28
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:123    .text.startup:00000000 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:128    .text.startup:00000000 .Loc.29
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:131    .text.startup:00000004 .Loc.30
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:134    .text.startup:00000008 .Loc.31
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:137    .text.startup:0000000e .Loc.32
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:140    .text.startup:00000012 .Loc.33
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:149    .text.startup:00000020 .Loc.34
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:150    .text.startup:00000020 .Loc.35
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:153    .text.startup:00000024 .Loc.36
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:155    .text.startup:00000026 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:167    .text:00000056 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:158    .text.startup:00000026 L0
+                     .debug_frame:00000000 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:95     .text:00000046 .L4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:106    .text:0000004e .L3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:57     .text:0000001a .L2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:148    .text.startup:00000020 .L6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:719    .debug_abbrev:00000000 .Ldebug_abbrev0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1247   .debug_ranges:00000000 .Ldebug_ranges0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1261   .debug_line:00000000 .Ldebug_line0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:121    .text.startup:00000000 .LFB16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:156    .text.startup:00000026 .LFE16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:130    .text.startup:00000004 .LVL6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:133    .text.startup:00000008 .LVL7
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:139    .text.startup:00000012 .LVL8
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:147    .text.startup:00000020 .LVL9
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:152    .text.startup:00000024 .LVL10
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:16     .text:00000000 .LFB15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:115    .text:00000056 .LFE15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1096   .debug_loc:00000000 .LLST0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1133   .debug_loc:0000004c .LLST1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1128   .debug_loc:00000048 .LVUS1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1154   .debug_loc:00000073 .LLST2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1147   .debug_loc:0000006d .LVUS2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1179   .debug_loc:000000a5 .LLST3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1172   .debug_loc:0000009f .LVUS3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1204   .debug_loc:000000d7 .LLST4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:1197   .debug_loc:000000d1 .LVUS4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:83     .text:00000038 .LVL4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:22     .text:00000002 .LCFI0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:26     .text:00000004 .LCFI1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:30     .text:00000006 .LCFI2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:34     .text:0000000a .LCFI3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:15     .text:00000000 .LVL0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:45     .text:0000000e .LVL1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:79     .text:00000032 .LVL3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:94     .text:00000046 .LVL5
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:74     .text:0000002c .LVL2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:168    .debug_info:00000000 .Ldebug_info0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:10     .text:00000000 .Ltext0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:159    .text:00000056 .Letext0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:49     .text:00000012 .LBB2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:64     .text:00000020 .LBE2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:96     .text:00000046 .LBB3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccrcsI1f.s:113    .text:00000056 .LBE3
+
+UNDEFINED SYMBOLS
+simpleserial_put
+platform_init
+init_uart0
+simpleserial_init
+simpleserial_addcmd
+simpleserial_get

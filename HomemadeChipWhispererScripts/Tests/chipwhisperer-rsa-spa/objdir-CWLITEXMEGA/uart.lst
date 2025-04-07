@@ -1,0 +1,407 @@
+   1               		.file	"uart.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__CCP__ = 0x34
+   7               	__tmp_reg__ = 0
+   8               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+  11               		.cfi_sections	.debug_frame
+  12               	.global	init_uart0
+  14               	init_uart0:
+  15               	.LFB15:
+  16               		.file 1 "./hal//xmega/uart.c"
+   1:./hal//xmega/uart.c **** #include "uart.h"
+   2:./hal//xmega/uart.c **** 
+   3:./hal//xmega/uart.c **** /*! Define that selects the Usart used in example. */
+   4:./hal//xmega/uart.c **** #define USART USARTC0
+   5:./hal//xmega/uart.c **** 
+   6:./hal//xmega/uart.c **** #define TIMEOUT 0
+   7:./hal//xmega/uart.c **** #define BYTE_REC 1
+   8:./hal//xmega/uart.c **** 
+   9:./hal//xmega/uart.c **** void												init_uart0
+  10:./hal//xmega/uart.c **** 	(
+  11:./hal//xmega/uart.c ****    void
+  12:./hal//xmega/uart.c ****    )
+  13:./hal//xmega/uart.c ****    {
+  17               		.loc 1 13 4 view -0
+  18               		.cfi_startproc
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  14:./hal//xmega/uart.c **** /* This PORT setting is only valid to USARTC0 if other USARTs is used a
+  15:./hal//xmega/uart.c **** 	 * different PORT and/or pins is used. */
+  16:./hal//xmega/uart.c **** 	/* PIN3 (TXD0) as output. */
+  17:./hal//xmega/uart.c **** 	PORTC.DIRSET = PIN3_bm;
+  23               		.loc 1 17 2 view .LVU1
+  24               		.loc 1 17 15 is_stmt 0 view .LVU2
+  25 0000 E0E4      		ldi r30,lo8(64)
+  26 0002 F6E0      		ldi r31,lo8(6)
+  27 0004 88E0      		ldi r24,lo8(8)
+  28 0006 8183      		std Z+1,r24
+  18:./hal//xmega/uart.c **** 
+  19:./hal//xmega/uart.c **** 	/* PC2 (RXD0) as input. */
+  20:./hal//xmega/uart.c **** 	PORTC.DIRCLR = PIN2_bm;
+  29               		.loc 1 20 2 is_stmt 1 view .LVU3
+  30               		.loc 1 20 15 is_stmt 0 view .LVU4
+  31 0008 84E0      		ldi r24,lo8(4)
+  32 000a 8283      		std Z+2,r24
+  21:./hal//xmega/uart.c **** 
+  22:./hal//xmega/uart.c **** 	/* USARTC0, 8 Data bits, No Parity, 1 Stop bit. */
+  23:./hal//xmega/uart.c **** 	USART_Format_Set(&USART, USART_CHSIZE_8BIT_gc, USART_PMODE_DISABLED_gc, false);
+  33               		.loc 1 23 2 is_stmt 1 view .LVU5
+  34 000c E0EA      		ldi r30,lo8(-96)
+  35 000e F8E0      		ldi r31,lo8(8)
+  36 0010 83E0      		ldi r24,lo8(3)
+  37 0012 8583      		std Z+5,r24
+  24:./hal//xmega/uart.c **** 
+  25:./hal//xmega/uart.c **** 	/* Set Baudrate to 9600 bps:
+  26:./hal//xmega/uart.c **** 	 * Use the default I/O clock fequency that is 2 MHz.
+  27:./hal//xmega/uart.c **** 	 * Do not use the baudrate scale factor
+  28:./hal//xmega/uart.c **** 	 *
+  29:./hal//xmega/uart.c **** 	 * Baudrate select = (1/(16*(((I/O clock frequency)/Baudrate)-1)
+  30:./hal//xmega/uart.c **** 	 *                 = 12
+  31:./hal//xmega/uart.c **** 	 */
+  32:./hal//xmega/uart.c **** 	#if SS_VER==SS_VER_2_1
+  33:./hal//xmega/uart.c **** 	USART_Baudrate_Set(&USART, 1, 0);
+  38               		.loc 1 33 2 view .LVU6
+  39 0014 81E0      		ldi r24,lo8(1)
+  40 0016 8683      		std Z+6,r24
+  41               		.loc 1 33 2 view .LVU7
+  42 0018 1782      		std Z+7,__zero_reg__
+  34:./hal//xmega/uart.c **** 	#else
+  35:./hal//xmega/uart.c **** 	USART_Baudrate_Set(&USART, 11, 0);
+  36:./hal//xmega/uart.c **** 	#endif
+  37:./hal//xmega/uart.c **** 
+  38:./hal//xmega/uart.c **** 	/* Enable both RX and TX. */
+  39:./hal//xmega/uart.c **** 	USART_Rx_Enable(&USART);
+  43               		.loc 1 39 2 view .LVU8
+  44 001a 8481      		ldd r24,Z+4
+  45 001c 8061      		ori r24,lo8(16)
+  46 001e 8483      		std Z+4,r24
+  40:./hal//xmega/uart.c **** 	USART_Tx_Enable(&USART);
+  47               		.loc 1 40 2 view .LVU9
+  48 0020 8481      		ldd r24,Z+4
+  49 0022 8860      		ori r24,lo8(8)
+  50 0024 8483      		std Z+4,r24
+  51               	/* epilogue start */
+  41:./hal//xmega/uart.c ****    }
+  52               		.loc 1 41 4 is_stmt 0 view .LVU10
+  53 0026 0895      		ret
+  54               		.cfi_endproc
+  55               	.LFE15:
+  57               	.global	input_ch_w_timeout_0
+  59               	input_ch_w_timeout_0:
+  60               	.LVL0:
+  61               	.LFB16:
+  42:./hal//xmega/uart.c **** 
+  43:./hal//xmega/uart.c **** unsigned char									input_ch_w_timeout_0
+  44:./hal//xmega/uart.c **** 	(
+  45:./hal//xmega/uart.c ****    char *					 	data,
+  46:./hal//xmega/uart.c ****    volatile unsigned int				timeout
+  47:./hal//xmega/uart.c ****    )
+  48:./hal//xmega/uart.c ****    {
+  62               		.loc 1 48 4 is_stmt 1 view -0
+  63               		.cfi_startproc
+  64               		.loc 1 48 4 is_stmt 0 view .LVU12
+  65 0028 CF93      		push r28
+  66               	.LCFI0:
+  67               		.cfi_def_cfa_offset 4
+  68               		.cfi_offset 28, -3
+  69 002a DF93      		push r29
+  70               	.LCFI1:
+  71               		.cfi_def_cfa_offset 5
+  72               		.cfi_offset 29, -4
+  73 002c 0F92      		push __tmp_reg__
+  74 002e 0F92      		push __tmp_reg__
+  75               	.LCFI2:
+  76               		.cfi_def_cfa_offset 7
+  77 0030 CDB7      		in r28,__SP_L__
+  78 0032 DEB7      		in r29,__SP_H__
+  79               	.LCFI3:
+  80               		.cfi_def_cfa_register 28
+  81               	/* prologue: function */
+  82               	/* frame size = 2 */
+  83               	/* stack size = 4 */
+  84               	.L__stack_usage = 4
+  85 0034 FC01      		movw r30,r24
+  86 0036 6983      		std Y+1,r22
+  87 0038 7A83      		std Y+2,r23
+  49:./hal//xmega/uart.c ****    unsigned int				timeout_counter = 0;
+  88               		.loc 1 49 4 is_stmt 1 view .LVU13
+  89               	.LVL1:
+  50:./hal//xmega/uart.c **** 
+  51:./hal//xmega/uart.c ****    
+  52:./hal//xmega/uart.c ****    //check if a byte has been recieved or if the timeout has been excedded
+  53:./hal//xmega/uart.c ****    while (timeout_counter != timeout)
+  90               		.loc 1 53 4 view .LVU14
+  49:./hal//xmega/uart.c ****    unsigned int				timeout_counter = 0;
+  91               		.loc 1 49 20 is_stmt 0 view .LVU15
+  92 003a 90E0      		ldi r25,0
+  93 003c 80E0      		ldi r24,0
+  94               	.LVL2:
+  95               	.L3:
+  96               		.loc 1 53 10 is_stmt 1 view .LVU16
+  97               		.loc 1 53 27 is_stmt 0 view .LVU17
+  98 003e 2981      		ldd r18,Y+1
+  99 0040 3A81      		ldd r19,Y+2
+ 100               		.loc 1 53 10 view .LVU18
+ 101 0042 2817      		cp r18,r24
+ 102 0044 3907      		cpc r19,r25
+ 103 0046 01F4      		brne .L6
+  54:./hal//xmega/uart.c **** 		{	
+  55:./hal//xmega/uart.c **** 		if (USART_IsRXComplete(&USART))
+  56:./hal//xmega/uart.c **** 			{
+  57:./hal//xmega/uart.c **** 			*data = USART_GetChar(&USART);
+  58:./hal//xmega/uart.c **** 			return BYTE_REC;
+  59:./hal//xmega/uart.c **** 			}
+  60:./hal//xmega/uart.c **** 		timeout_counter++;
+  61:./hal//xmega/uart.c **** 		}
+  62:./hal//xmega/uart.c **** 		
+  63:./hal//xmega/uart.c **** 	return TIMEOUT;
+ 104               		.loc 1 63 9 view .LVU19
+ 105 0048 80E0      		ldi r24,0
+ 106               	.LVL3:
+ 107               		.loc 1 63 9 view .LVU20
+ 108 004a 00C0      		rjmp .L2
+ 109               	.LVL4:
+ 110               	.L6:
+  55:./hal//xmega/uart.c **** 			{
+ 111               		.loc 1 55 3 is_stmt 1 view .LVU21
+  55:./hal//xmega/uart.c **** 			{
+ 112               		.loc 1 55 7 is_stmt 0 view .LVU22
+ 113 004c 2091 A108 		lds r18,2209
+  55:./hal//xmega/uart.c **** 			{
+ 114               		.loc 1 55 6 view .LVU23
+ 115 0050 27FF      		sbrs r18,7
+ 116 0052 00C0      		rjmp .L4
+  57:./hal//xmega/uart.c **** 			return BYTE_REC;
+ 117               		.loc 1 57 4 is_stmt 1 view .LVU24
+  57:./hal//xmega/uart.c **** 			return BYTE_REC;
+ 118               		.loc 1 57 12 is_stmt 0 view .LVU25
+ 119 0054 8091 A008 		lds r24,2208
+ 120               	.LVL5:
+  57:./hal//xmega/uart.c **** 			return BYTE_REC;
+ 121               		.loc 1 57 10 view .LVU26
+ 122 0058 8083      		st Z,r24
+  58:./hal//xmega/uart.c **** 			}
+ 123               		.loc 1 58 4 is_stmt 1 view .LVU27
+  58:./hal//xmega/uart.c **** 			}
+ 124               		.loc 1 58 11 is_stmt 0 view .LVU28
+ 125 005a 81E0      		ldi r24,lo8(1)
+ 126               	.L2:
+ 127               	/* epilogue start */
+  64:./hal//xmega/uart.c **** 	}
+ 128               		.loc 1 64 2 view .LVU29
+ 129 005c 0F90      		pop __tmp_reg__
+ 130 005e 0F90      		pop __tmp_reg__
+ 131 0060 DF91      		pop r29
+ 132 0062 CF91      		pop r28
+ 133 0064 0895      		ret
+ 134               	.LVL6:
+ 135               	.L4:
+  60:./hal//xmega/uart.c **** 		}
+ 136               		.loc 1 60 3 is_stmt 1 view .LVU30
+  60:./hal//xmega/uart.c **** 		}
+ 137               		.loc 1 60 18 is_stmt 0 view .LVU31
+ 138 0066 0196      		adiw r24,1
+ 139               	.LVL7:
+  60:./hal//xmega/uart.c **** 		}
+ 140               		.loc 1 60 18 view .LVU32
+ 141 0068 00C0      		rjmp .L3
+ 142               		.cfi_endproc
+ 143               	.LFE16:
+ 145               	.global	input_ch_0
+ 147               	input_ch_0:
+ 148               	.LFB17:
+  65:./hal//xmega/uart.c **** 		
+  66:./hal//xmega/uart.c **** char												input_ch_0
+  67:./hal//xmega/uart.c **** 	(
+  68:./hal//xmega/uart.c ****    void
+  69:./hal//xmega/uart.c ****    )
+  70:./hal//xmega/uart.c ****    {
+ 149               		.loc 1 70 4 is_stmt 1 view -0
+ 150               		.cfi_startproc
+ 151               	/* prologue: function */
+ 152               	/* frame size = 0 */
+ 153               	/* stack size = 0 */
+ 154               	.L__stack_usage = 0
+ 155               	.L8:
+  71:./hal//xmega/uart.c ****    //check if a byte has been recieved or if the timeout has been excedded
+  72:./hal//xmega/uart.c ****    while (!USART_IsRXComplete(&USART))
+ 156               		.loc 1 72 10 view .LVU34
+ 157               		.loc 1 72 12 is_stmt 0 view .LVU35
+ 158 006a 8091 A108 		lds r24,2209
+ 159               		.loc 1 72 10 view .LVU36
+ 160 006e 87FF      		sbrs r24,7
+ 161 0070 00C0      		rjmp .L8
+  73:./hal//xmega/uart.c **** 		{
+  74:./hal//xmega/uart.c **** 		continue;		
+  75:./hal//xmega/uart.c **** 		}		
+  76:./hal//xmega/uart.c **** 	return USART_GetChar(&USART);;
+ 162               		.loc 1 76 2 is_stmt 1 view .LVU37
+ 163               		.loc 1 76 9 is_stmt 0 view .LVU38
+ 164 0072 8091 A008 		lds r24,2208
+ 165               		.loc 1 76 31 is_stmt 1 view .LVU39
+ 166               	/* epilogue start */
+  77:./hal//xmega/uart.c **** 	}
+ 167               		.loc 1 77 2 is_stmt 0 view .LVU40
+ 168 0076 0895      		ret
+ 169               		.cfi_endproc
+ 170               	.LFE17:
+ 172               	.global	output_ch_0
+ 174               	output_ch_0:
+ 175               	.LFB18:
+  78:./hal//xmega/uart.c **** 	
+  79:./hal//xmega/uart.c **** void												output_ch_0
+  80:./hal//xmega/uart.c **** 	(
+  81:./hal//xmega/uart.c **** 	char							data
+  82:./hal//xmega/uart.c **** 	)
+  83:./hal//xmega/uart.c **** 	{
+ 176               		.loc 1 83 2 is_stmt 1 view -0
+ 177               		.cfi_startproc
+ 178               	/* prologue: function */
+ 179               	/* frame size = 0 */
+ 180               	/* stack size = 0 */
+ 181               	.L__stack_usage = 0
+ 182               	.LVL8:
+ 183               	.L11:
+  84:./hal//xmega/uart.c **** 	while(!USART_IsTXDataRegisterEmpty(&USART));
+ 184               		.loc 1 84 45 discriminator 1 view .LVU42
+ 185               		.loc 1 84 7 discriminator 1 view .LVU43
+ 186               		.loc 1 84 9 is_stmt 0 discriminator 1 view .LVU44
+ 187 0078 9091 A108 		lds r25,2209
+ 188               		.loc 1 84 7 discriminator 1 view .LVU45
+ 189 007c 95FF      		sbrs r25,5
+ 190 007e 00C0      		rjmp .L11
+  85:./hal//xmega/uart.c **** 	USART_PutChar(&USART, data);
+ 191               		.loc 1 85 2 is_stmt 1 view .LVU46
+ 192 0080 8093 A008 		sts 2208,r24
+  86:./hal//xmega/uart.c **** 	return;
+ 193               		.loc 1 86 2 view .LVU47
+ 194               	/* epilogue start */
+  87:./hal//xmega/uart.c **** 	}...
+ 195               		.loc 1 87 2 is_stmt 0 view .LVU48
+ 196 0084 0895      		ret
+ 197               		.cfi_endproc
+ 198               	.LFE18:
+ 200               	.Letext0:
+ 201               		.file 2 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/stdint.h"
+ 202               		.file 3 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/lib/avr-gcc/9/gcc/avr/9.4.0/include/stddef.h"
+ 203               		.file 4 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/stdlib.h"
+ 204               		.file 5 "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include/avr/iox128d3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart.c
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:2      *ABS*:0000003e __SP_H__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:3      *ABS*:0000003d __SP_L__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:4      *ABS*:0000003f __SREG__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:5      *ABS*:0000003b __RAMPZ__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:6      *ABS*:00000034 __CCP__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:7      *ABS*:00000000 __tmp_reg__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:8      *ABS*:00000001 __zero_reg__
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:14     .text:00000000 init_uart0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:17     .text:00000000 .Loc.0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:18     .text:00000000 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:23     .text:00000000 .Loc.1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:24     .text:00000000 .Loc.2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:29     .text:00000008 .Loc.3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:30     .text:00000008 .Loc.4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:33     .text:0000000c .Loc.5
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:38     .text:00000014 .Loc.6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:41     .text:00000018 .Loc.7
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:43     .text:0000001a .Loc.8
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:47     .text:00000020 .Loc.9
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:52     .text:00000026 .Loc.10
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:54     .text:00000028 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:59     .text:00000028 input_ch_w_timeout_0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:62     .text:00000028 .Loc.11
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:63     .text:00000028 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:64     .text:00000028 .Loc.12
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:88     .text:0000003a .Loc.13
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:90     .text:0000003a .Loc.14
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:91     .text:0000003a .Loc.15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:96     .text:0000003e .Loc.16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:97     .text:0000003e .Loc.17
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:100    .text:00000042 .Loc.18
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:104    .text:00000048 .Loc.19
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:107    .text:0000004a .Loc.20
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:111    .text:0000004c .Loc.21
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:112    .text:0000004c .Loc.22
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:114    .text:00000050 .Loc.23
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:117    .text:00000054 .Loc.24
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:118    .text:00000054 .Loc.25
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:121    .text:00000058 .Loc.26
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:123    .text:0000005a .Loc.27
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:124    .text:0000005a .Loc.28
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:128    .text:0000005c .Loc.29
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:136    .text:00000066 .Loc.30
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:137    .text:00000066 .Loc.31
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:140    .text:00000068 .Loc.32
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:142    .text:0000006a L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:147    .text:0000006a input_ch_0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:149    .text:0000006a .Loc.33
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:150    .text:0000006a L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:156    .text:0000006a .Loc.34
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:157    .text:0000006a .Loc.35
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:159    .text:0000006e .Loc.36
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:162    .text:00000072 .Loc.37
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:163    .text:00000072 .Loc.38
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:165    .text:00000076 .Loc.39
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:167    .text:00000076 .Loc.40
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:169    .text:00000078 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:174    .text:00000078 output_ch_0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:176    .text:00000078 .Loc.41
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:177    .text:00000078 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:184    .text:00000078 .Loc.42
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:185    .text:00000078 .Loc.43
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:186    .text:00000078 .Loc.44
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:188    .text:0000007c .Loc.45
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:191    .text:00000080 .Loc.46
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:193    .text:00000084 .Loc.47
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:195    .text:00000084 .Loc.48
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:197    .text:00000086 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:205    .text:00000086 L0
+                     .debug_frame:00000000 L0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:110    .text:0000004c .L6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:126    .text:0000005c .L2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:135    .text:00000066 .L4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:95     .text:0000003e .L3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:155    .text:0000006a .L8
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:183    .text:00000078 .L11
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:762    .debug_abbrev:00000000 .Ldebug_abbrev0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:10     .text:00000000 .Ltext0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:200    .text:00000086 .Letext0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1241   .debug_line:00000000 .Ldebug_line0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:175    .text:00000078 .LFB18
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:198    .text:00000086 .LFE18
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1119   .debug_loc:00000002 .LLST3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1116   .debug_loc:00000000 .LVUS3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:148    .text:0000006a .LFB17
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:170    .text:00000078 .LFE17
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:61     .text:00000028 .LFB16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:143    .text:0000006a .LFE16
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1126   .debug_loc:00000015 .LLST0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1163   .debug_loc:00000061 .LLST1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1158   .debug_loc:0000005d .LVUS1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1193   .debug_loc:00000091 .LLST2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:1184   .debug_loc:00000089 .LVUS2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:15     .text:00000000 .LFB15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:55     .text:00000028 .LFE15
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:182    .text:00000078 .LVL8
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:66     .text:0000002a .LCFI0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:70     .text:0000002c .LCFI1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:75     .text:00000030 .LCFI2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:79     .text:00000034 .LCFI3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:60     .text:00000028 .LVL0
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:94     .text:0000003e .LVL2
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:89     .text:0000003a .LVL1
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:106    .text:0000004a .LVL3
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:109    .text:0000004c .LVL4
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:120    .text:00000058 .LVL5
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:134    .text:00000066 .LVL6
+/var/folders/wq/x3vp_84133jc_nxh28zg58gh0000gn/T//ccQlV0nz.s:206    .debug_info:00000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS
