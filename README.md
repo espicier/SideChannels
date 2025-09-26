@@ -10,7 +10,7 @@ Ce projet s'est donc étendu sur l'année en deux phases :
 - le premier semestre a été consacré aux recherches bibliographiques sur les attaques par canaux auxiliaires : leur historique, leur fondements théoriques, leur fonctionnement en pratique, les implémentations déjà réalisées (papiers de recherche) et les contre-mesures existantes.
 - le second semestre a été consacré à l'implémentation en Python d'attaques classiques (SPA, DPA, CPA) et d'autres plus élaborées (reverse engineering sur bootloader AES-256), le tout en environnement simulé (traces de consommation électrique pré-enregistrées) en étant guidés par des labs Jupyter dédiés à l'apprentissage des side-channels et de la technologie Chipwhisperer. Mais nous avons aussi écrit nos propres labs d'apprentissage des différents types d'attaques classiques (voir `homemade_labs`). Nous avons également implémenté les grandes lignes d'une attaque SPA sur RSA en conditions réelles via un Chipwhisperer (voir `HomemadeChipwhispererScripts`). Et enfin, nous avons étudié et comparé les différents modèles d'attaques side-channels basées sur de l'IA (section 5 du rapport S2).
 
-  ## Contributeurs
+## Contributeurs
   - Gaetan Bois-Baumann : recherches bibliographiques, implémentation d'attaque SPA sur RSA avec le Chipwhisperer (voir `HomemadeChipwhispererScripts`), étude des attaques basées deep-learning (voir `DLSPA` et `ASCAD`).
   - Anaïs Espicier : recherches bibliographiques, implémentation d'attaques SPA/DPA/CPA sur AES et RSA à l'aide des labs Chipwhisperer (voir `ChipWhispererLabSolutions`), réalisation de labs d'initiation aux attaques par canaux auxiliaires (voir `homemade_labs`).
   - Noah Staple : recherches bibliographiques, reverse engineering sur bootloader AES-256.
